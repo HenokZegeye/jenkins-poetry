@@ -1,0 +1,44 @@
+pipeline {
+    agent { 
+        docker {
+            image 'docker-registry-remote.artifactory-espoo1.int.net.nokia.com/devopsjourney1/myjenkinsagents:python'
+            label 'docker-poetry'
+        }
+      }
+    triggers {
+        pollSCM '* * * * *'
+    }
+    stages {
+        stage('Build') {
+            steps {
+                echo "Building.."
+                script {
+                    sh '''
+                        poetry config virtualenvs.in-project true
+                    '''
+                }
+                
+            }
+        }
+        stage('Test') {
+            steps {
+                echo "Testing.."
+                script {
+                    sh '''
+                        poetry install
+                        poetry run pytest
+                    '''
+                }
+                
+            }
+        }
+        stage('Deliver') {
+            steps {
+                echo 'Deliver....'
+                sh '''
+                echo "doing delivery stuff.."
+                '''
+            }
+        }
+    }
+}
