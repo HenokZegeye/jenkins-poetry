@@ -1,10 +1,5 @@
 pipeline {
-    agent { 
-        docker {
-            image 'docker-registry-remote.artifactory-espoo1.int.net.nokia.com/devopsjourney1/myjenkinsagents:python'
-            label 'docker-poetry'
-        }
-      }
+    agent any
     triggers {
         pollSCM '* * * * *'
     }
@@ -14,7 +9,8 @@ pipeline {
                 echo "Building.."
                 script {
                     sh '''
-                        poetry config virtualenvs.in-project true
+                        curl -sSL https://install.python-poetry.org | python3
+                        $HOME/.local/bin/poetry config virtualenvs.in-project true
                     '''
                 }
                 
@@ -25,8 +21,8 @@ pipeline {
                 echo "Testing.."
                 script {
                     sh '''
-                        poetry install
-                        poetry run pytest
+                        $HOME/.local/bin/poetry install
+                        $HOME/.local/bin/poetry run pytest
                     '''
                 }
                 
